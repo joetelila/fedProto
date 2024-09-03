@@ -1,0 +1,26 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) CCconfig        6)  ucx/1.14.1         11) flexiblas/3.3.1
+  2) gentoo/2023     7)  libfabric/1.18.0   12) imkl/2023.2.0
+  3) gcccore/.12.3   8)  pmix/4.2.4         13) StdEnv/2023
+  4) gcc/12.3        9)  ucc/1.2.0
+  5) hwloc/2.9.1     10) openmpi/4.1.5
+/home/joet/UWO/lib/python3.10/site-packages/torch/cuda/__init__.py:619: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Traceback (most recent call last):
+  File "/project/6010096/joet/fedProto/train_iid.py", line 101, in <module>
+    main()
+  File "/project/6010096/joet/fedProto/train_iid.py", line 25, in main
+    clients = [Net().to(args.device) for _ in range(args.clients)]
+  File "/project/6010096/joet/fedProto/train_iid.py", line 25, in <listcomp>
+    clients = [Net().to(args.device) for _ in range(args.clients)]
+  File "/home/joet/UWO/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1173, in to
+    return self._apply(convert)
+  File "/home/joet/UWO/lib/python3.10/site-packages/torch/nn/modules/module.py", line 779, in _apply
+    module._apply(fn)
+  File "/home/joet/UWO/lib/python3.10/site-packages/torch/nn/modules/module.py", line 804, in _apply
+    param_applied = fn(param)
+  File "/home/joet/UWO/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1159, in convert
+    return t.to(
+RuntimeError: PyTorch is not linked with support for mps devices
