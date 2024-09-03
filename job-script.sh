@@ -6,10 +6,12 @@
 #SBATCH --mail-user=ytelila@uwo.ca
 #SBATCH --mail-type=ALL
 
-cd /home/joet/projects/def-kgroling/joet/fedproto
+cd /home/joet/projects/def-kgroling/joet/fedProto/
 module purge
+
 module load python/3.10 scipy-stack
+module load arrow/16.1.0
 
 source ~/UWO/bin/activate
 
-python main.py
+python train_iid.py
