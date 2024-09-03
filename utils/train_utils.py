@@ -15,26 +15,21 @@ def set_parameters(net, parameters: List[np.ndarray]):
     params_dict = zip(net.state_dict().keys(), parameters)
     state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
     net.load_state_dict(state_dict, strict=True)
+    return net
 
 
-def train(net, trainloader, epochs: int):
+def train(args, net, trainloader):
     """Train the network on the training set."""
 
-    # define device  torch.backends.mps.is_available()
-    DEVICE  = torch.device(
-    "cuda" if torch.cuda.is_available() 
-    else "mps" if torch.backends.mps.is_available() 
-    else "cpu"
-    )
 
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(net.parameters())
+    optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
     net.train()
-    for epoch in range(epochs):
+    for epoch in range(args.epoch):
         correct, total, epoch_loss = 0, 0, 0.0
         for batch in trainloader:
             images, labels = batch["img"], batch["label"]
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            images, labels = images.to(args.device), labels.to(args.device)
             optimizer.zero_grad()
             outputs = net(images)
             loss = criterion(net(images), labels)
@@ -46,25 +41,20 @@ def train(net, trainloader, epochs: int):
             correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
         epoch_loss /= len(trainloader.dataset)
         epoch_acc = correct / total
-        print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}")
+        if args.clog:
+            print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}")
+    return net
 
 
-def test(net, testloader):
+def test(args, net, testloader):
     """Evaluate the network on the entire test set."""
-
-    DEVICE  = torch.device(
-    "cuda" if torch.cuda.is_available() 
-    else "mps" if torch.backends.mps.is_available() 
-    else "cpu"
-    )
-
     criterion = torch.nn.CrossEntropyLoss()
     correct, total, loss = 0, 0, 0.0
     net.eval()
     with torch.no_grad():
         for batch in testloader:
             images, labels = batch["img"], batch["label"]
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            images, labels = images.to(args.device), labels.to(args.device)
             outputs = net(images)
             loss += criterion(outputs, labels).item()
             _, predicted = torch.max(outputs.data, 1)
@@ -72,4 +62,13 @@ def test(net, testloader):
             correct += (predicted == labels).sum().item()
     loss /= len(testloader.dataset)
     accuracy = correct / total
+    if args.clog:
+        print(f"Test loss {loss}, accuracy {accuracy}")
     return loss, accuracy
+
+
+def fed_average(models):
+    """Compute the average of the given models."""
+    # Use the state_dict() method to get the parameters of a model
+    avg_state = sum([model.state_dict() for model in models]) / len(models)
+    return avg_state

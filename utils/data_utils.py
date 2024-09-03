@@ -8,9 +8,11 @@ from flwr_datasets.preprocessor import Merger
 # torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import torch
 
 
 def load_datasets(args, partition_id: int):
+
 
     # merge train and test data
     merger = Merger(
@@ -81,3 +83,11 @@ def load_datasets(args, partition_id: int):
     testloader = DataLoader(partition_train_test["test"], batch_size=args.batchsize)
   
     return trainloader, testloader
+
+
+def are_models_equal(model1, model2):
+    # Compare the state_dict of both models
+    for param1, param2 in zip(model1.state_dict().values(), model2.state_dict().values()):
+        if not torch.equal(param1, param2):
+            return False
+    return True
