@@ -50,6 +50,7 @@ def main():
     
             
             train_loader, test_loader = load_datasets(args, _client)
+            #train_loader, test_loader = load_local_datasets(args, _client)
             _client_model_trained = train(args, _client_model, train_loader)
 
             _loss, _acc = test(args, _client_model_trained, test_loader)
@@ -89,7 +90,7 @@ def parse_arguments():
     parser.add_argument('-split', '--split', default=0.2, type=int, help='log all outputs')
     parser.add_argument('-epochs', '--epoch', default=10, type=int, help='total epoch per clients')
     parser.add_argument('-lr', '--lr', default=0.001, type=float, help='learning rate')
-    parser.add_argument('-device', '--device', default='cuda', type=str, help='device to train the model')
+    parser.add_argument('-device', '--device', default='mps', type=str, help='device to train the model')
     parser.add_argument('-round', '--round', default=1, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.8, type=float, help='client split for training')
 
