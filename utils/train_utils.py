@@ -21,14 +21,15 @@ def set_parameters(net, parameters: List[np.ndarray]):
 def train(args, net, trainloader):
     """Train the network on the training set."""
 
-
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
     net.train()
     for epoch in range(args.epoch):
         correct, total, epoch_loss = 0, 0, 0.0
         for batch in trainloader:
+            
             images, labels = batch["img"], batch["label"]
+
             images, labels = images.to(args.device), labels.to(args.device)
             optimizer.zero_grad()
             outputs = net(images)
@@ -72,3 +73,13 @@ def fed_average(models):
     # Use the state_dict() method to get the parameters of a model
     avg_state = sum([model.state_dict() for model in models]) / len(models)
     return avg_state
+
+def running_model_avg(current, next, scale):
+    if current == None:
+        current = next
+        for key in current:
+            current[key] = current[key] * scale
+    else:
+        for key in current:
+            current[key] = current[key] + (next[key] * scale)
+    return current
