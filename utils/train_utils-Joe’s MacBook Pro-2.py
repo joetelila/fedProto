@@ -27,13 +27,10 @@ def train(args, net, trainloader):
     for epoch in range(args.epoch):
         correct, total, epoch_loss = 0, 0, 0.0
         for batch in trainloader:
-            match args.data:
-                case "mnist":
-                    images, labels = batch["image"], batch["label"]
-                case "cifar10":
-                    images, labels = batch["img"], batch["label"]
-                case _:
-                    raise ValueError(f"Unknown dataset: {args.dataset}")
+            match args.dataset:
+                
+            images, labels = batch["image"], batch["label"]
+
             images, labels = images.to(args.device), labels.to(args.device)
             optimizer.zero_grad()
             outputs = net(images)
@@ -58,13 +55,7 @@ def test(args, net, testloader):
     net.eval()
     with torch.no_grad():
         for batch in testloader:
-            match args.data:
-                case "mnist":
-                    images, labels = batch["image"], batch["label"]
-                case "cifar10":
-                    images, labels = batch["img"], batch["label"]
-                case _:
-                    raise ValueError(f"Unknown dataset: {args.dataset}")
+            images, labels = batch["imaga"], batch["label"]
             images, labels = images.to(args.device), labels.to(args.device)
             outputs = net(images)
             loss += criterion(outputs, labels).item()

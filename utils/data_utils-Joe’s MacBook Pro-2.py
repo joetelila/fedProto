@@ -24,7 +24,7 @@ def load_mnist_partition(args, partition_id: int):
 
     #fds = FederatedDataset(dataset="cifar10", partitioners={"train": num_partitions})
     fds = FederatedDataset(
-        dataset="ylecun/mnist",
+        dataset="cifar10",
         partitioners={
             "train": IidPartitioner(
                         num_partitions=args.clients,
@@ -40,30 +40,27 @@ def load_mnist_partition(args, partition_id: int):
                     ),
         },
     )
+    client_partition = fds.load_partition(partition_id)
 
-    client_partition = fds.load_partition(partition_id, split="train")
     global_test = fds.load_split("test")
 
 
-
-    # pytorch_transforms = transforms.Compose(
-    #     [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-    # )
-    pytorch_transforms = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+    pytorch_transforms = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+    )
 
     def apply_transforms(batch):
-       batch["image"] = [pytorch_transforms(img) for img in batch["image"]]
-       return batch
-    # Apply the transforms
+        batch["img"] = [pytorch_transforms(img) for img in batch["img"]]
+        return batch
+
     client_partition = client_partition.with_transform(apply_transforms)
     global_test = global_test.with_transform(apply_transforms)
 
-    # Prepare the DataLoader
     trainloader = DataLoader(client_partition, batch_size=args.batchsize)
+
     testloader = DataLoader(global_test, batch_size=args.batchsize)
   
     return trainloader, testloader
-
 
 
 def load_cifar10_partition(args, partition_id: int):
@@ -86,9 +83,10 @@ def load_cifar10_partition(args, partition_id: int):
                     ),
         },
     )
-
     client_partition = fds.load_partition(partition_id)
+
     global_test = fds.load_split("test")
+
 
     pytorch_transforms = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
@@ -98,12 +96,11 @@ def load_cifar10_partition(args, partition_id: int):
         batch["img"] = [pytorch_transforms(img) for img in batch["img"]]
         return batch
 
-    # Apply the transforms
     client_partition = client_partition.with_transform(apply_transforms)
     global_test = global_test.with_transform(apply_transforms)
 
-    # Prepare the DataLoader
     trainloader = DataLoader(client_partition, batch_size=args.batchsize)
+
     testloader = DataLoader(global_test, batch_size=args.batchsize)
   
     return trainloader, testloader
