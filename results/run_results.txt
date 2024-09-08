@@ -1,0 +1,133 @@
+Dataset: mnist
+Total number of clients: 10
+Total number of global rounds: 20
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+iid: False
+split: 0.2
+clsplit: 0.99
+Global round 1 loss: 0.047547309720516205, accuracy: 0.5585
+Global round 2 loss: 0.025053333607316017, accuracy: 0.7001
+Global round 3 loss: 0.02003214595913887, accuracy: 0.7814
+Global round 4 loss: 0.02080201123058796, accuracy: 0.7954
+Global round 5 loss: 0.02037295898720622, accuracy: 0.8109
+Global round 6 loss: 0.018350742434710264, accuracy: 0.8411
+Global round 7 loss: 0.01638221282288432, accuracy: 0.8648
+Global round 8 loss: 0.016003118410333993, accuracy: 0.8689
+Global round 9 loss: 0.014557176421210169, accuracy: 0.8771
+Global round 10 loss: 0.013390587014332414, accuracy: 0.8883
+Global round 11 loss: 0.012147943951375783, accuracy: 0.9036
+Global round 12 loss: 0.013748367781192065, accuracy: 0.8874
+Global round 13 loss: 0.01299411968551576, accuracy: 0.8952
+Global round 14 loss: 0.011535859504900872, accuracy: 0.9096
+Global round 15 loss: 0.012164565581083298, accuracy: 0.9091
+Global round 16 loss: 0.010920090510509909, accuracy: 0.9142
+Global round 17 loss: 0.011408227228932083, accuracy: 0.9108
+Global round 18 loss: 0.012149265772104264, accuracy: 0.906
+Global round 19 loss: 0.010619677424710244, accuracy: 0.9218
+Global round 20 loss: 0.010077113144658506, accuracy: 0.9215
+(UWO) (-)joetelila $ python3 train_iid.py
+Dataset: mnist
+Total number of clients: 10
+Total number of global rounds: 20
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+iid: True
+split: 0.2
+clsplit: 0.99
+Global round 1 loss: 0.0021807253376580774, accuracy: 0.9766
+Global round 2 loss: 0.0014088992416490327, accuracy: 0.9879
+Global round 3 loss: 0.0012345221819971813, accuracy: 0.9896
+Global round 4 loss: 0.0012324672753940731, accuracy: 0.9906
+Global round 5 loss: 0.0012595537173482, accuracy: 0.9902
+Global round 6 loss: 0.0012833318184789313, accuracy: 0.9912
+Global round 7 loss: 0.0012864928850009648, accuracy: 0.991
+Global round 8 loss: 0.0012928335665587177, accuracy: 0.9914
+Global round 9 loss: 0.0013407020123404729, accuracy: 0.9909
+Global round 10 loss: 0.0013923532930732048, accuracy: 0.9913
+Global round 11 loss: 0.0013819297327158776, accuracy: 0.9912
+Global round 12 loss: 0.0013863608373704986, accuracy: 0.991
+Using the latest cached version of the dataset since ylecun/mnist couldn't be found on the Hugging Face Hub
+Found the latest cached dataset configuration 'mnist' at /Users/joetelila/.cache/huggingface/datasets/ylecun___mnist/mnist/0.0.0/77f3279092a1c1579b2250db8eafed0ad422088c (last modified on Sat Sep  7 16:30:26 2024).
+Global round 13 loss: 0.0014336184637261866, accuracy: 0.9913
+Global round 14 loss: 0.0014837716150997412, accuracy: 0.9908
+Global round 15 loss: 0.0014680826112361631, accuracy: 0.9914
+Global round 16 loss: 0.0015640737450461932, accuracy: 0.9916
+Global round 17 loss: 0.0014746520142600993, accuracy: 0.9914
+Global round 18 loss: 0.0015252743721283811, accuracy: 0.9914
+Global round 19 loss: 0.0016778909566905452, accuracy: 0.991
+Global round 20 loss: 0.0016344224294258488, accuracy: 0.9913
+(UWO) (-)joetelila $ python3 train_iid.py
+Dataset: cifar10
+Total number of clients: 10
+Total number of global rounds: 20
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+iid: True
+split: 0.2
+clsplit: 0.99
+Global round 1 loss: 0.053724436461925505, accuracy: 0.4051
+Global round 2 loss: 0.04045754927396774, accuracy: 0.5539
+Global round 3 loss: 0.044219718343019486, accuracy: 0.5782
+Global round 4 loss: 0.05135046544969082, accuracy: 0.5831
+Global round 5 loss: 0.059266933459043505, accuracy: 0.5839
+Global round 6 loss: 0.06435882304906845, accuracy: 0.5815
+Global round 7 loss: 0.06958657939434051, accuracy: 0.5802
+Global round 8 loss: 0.07319697932004929, accuracy: 0.5765
+Global round 9 loss: 0.07583730855584145, accuracy: 0.5745
+Global round 10 loss: 0.07841632011532783, accuracy: 0.5718
+Global round 11 loss: 0.08140609385967254, accuracy: 0.5662
+Global round 12 loss: 0.0812726232290268, accuracy: 0.5658
+Global round 13 loss: 0.08317545071840286, accuracy: 0.5656
+Global round 14 loss: 0.08974260956048966, accuracy: 0.568
+Global round 15 loss: 0.09550411235094071, accuracy: 0.5637
+Global round 16 loss: 0.09543456505537033, accuracy: 0.5645
+Global round 17 loss: 0.08971322398781777, accuracy: 0.5652
+Global round 18 loss: 0.09337164105772972, accuracy: 0.5636
+Global round 19 loss: 0.09818044680953025, accuracy: 0.5671
+Global round 20 loss: 0.098252986651659, accuracy: 0.564
+(UWO) (-)joetelila $ python3 train_iid.py
+Dataset: cifar10
+Total number of clients: 10
+Total number of global rounds: 20
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+iid: False
+split: 0.2
+clsplit: 0.99
+Global round 1 loss: 0.07108840789794922, accuracy: 0.1494
+Global round 2 loss: 0.06490513426065445, accuracy: 0.2752
+Global round 3 loss: 0.061837480771541595, accuracy: 0.3409
+Global round 4 loss: 0.06320306687355041, accuracy: 0.3644
+Global round 5 loss: 0.06749759297370911, accuracy: 0.3748
+Global round 6 loss: 0.067613658452034, accuracy: 0.3967
+Global round 7 loss: 0.07509237565994263, accuracy: 0.4064
+Global round 8 loss: 0.08035785011053086, accuracy: 0.4115
+Global round 9 loss: 0.08192952605485916, accuracy: 0.4196
+Global round 10 loss: 0.08758585284948349, accuracy: 0.42
+Global round 11 loss: 0.0878915852189064, accuracy: 0.4229
+Global round 12 loss: 0.09253238552808761, accuracy: 0.4266
+Global round 13 loss: 0.09085868960618973, accuracy: 0.4313
+Global round 14 loss: 0.09220374021530152, accuracy: 0.4318
+Global round 15 loss: 0.09428213442564011, accuracy: 0.4397
+Global round 16 loss: 0.09803696269989014, accuracy: 0.4368
+Global round 17 loss: 0.10575954591035842, accuracy: 0.437
+Global round 18 loss: 0.10430912364721298, accuracy: 0.4397
+Global round 19 loss: 0.10256133651733398, accuracy: 0.4365
+Global round 20 loss: 0.10652194740772247, accuracy: 0.4387
