@@ -15,7 +15,7 @@ Global round 2 loss: 0.025053333607316017, accuracy: 0.7001
 Global round 3 loss: 0.02003214595913887, accuracy: 0.7814
 Global round 4 loss: 0.02080201123058796, accuracy: 0.7954
 Global round 5 loss: 0.02037295898720622, accuracy: 0.8109
-Global round 6 loss: 0.018350742434710264, accuracy: 0.8411
+Global round `6 loss: 0.018350742434710264, accuracy: 0.8411
 Global round 7 loss: 0.01638221282288432, accuracy: 0.8648
 Global round 8 loss: 0.016003118410333993, accuracy: 0.8689
 Global round 9 loss: 0.014557176421210169, accuracy: 0.8771

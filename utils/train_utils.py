@@ -37,7 +37,7 @@ def train(args, net, trainloader):
             images, labels = images.to(args.device), labels.to(args.device)
             optimizer.zero_grad()
             outputs = net(images)
-            loss = criterion(net(images), labels)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             # Metrics
