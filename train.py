@@ -49,9 +49,19 @@ def main():
 
     # initalize client models with global model
     clients = [global_model for _ in range(args.clients)]
+    
+    # initialize global class prototype
+    global_proto = {
+        #i: torch.zeros(120) for i in range(10)
+    }
 
     # train FL
     for _round in range(args.round):
+
+        
+        # inialize round client prototypes.
+        # Store client prototypes after training.
+        client_protos = {}
 
         # select csplit clients randomly
         random.seed(args.seed)
@@ -61,9 +71,13 @@ def main():
             print(f"Round {_round} selected clients: {round_clients}")
 
         # collect round models for averaging if not using fedproto
-        #if not args.fedproto:
-        running_avg = None
+        if not args.fedproto:
+            running_avg = None
         
+        # collect client accuracies
+        client_test_acc = 0
+        client_test_loss = 0
+
         # train the selected clients
         for _client in round_clients:
             
@@ -86,20 +100,41 @@ def main():
                     raise ValueError(f"Unknown dataset: {args.data}")
         
             # train the client model
-            _client_model_trained = train(args, _client_model, train_loader)
+            if args.fedproto:
+                _client_model_trained, protos = train(args, _client_model, train_loader, global_proto)
+                _loss, _acc = test(args, _client_model_trained, testloader)
+                client_test_acc += _acc
+                client_test_loss += _loss
+                
+                # collect client prototypes
+                for key in protos.keys():
+                    if key in client_protos.keys():
+                        client_protos[key].append(protos[key])
+                    else:
+                        client_protos[key] = [protos[key]]
+               
+            else:
+                _client_model_trained = train(args, _client_model, train_loader, global_proto)
+                # evaluate the client model
             # add local model parameters to running average
             
-            #if not args.fedproto:
-            running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
+            # Running average of the models
+            if not args.fedproto:
+                running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
 
             #round_models.append(_client_model_trained)
 
-        # average the models
-        #round_average_model = fed_average(round_models)
-        #if not args.fedproto:
-        global_model.load_state_dict(running_avg)
-        _loss, _acc = test(args, global_model, testloader)
-        print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
+        # average the client prototypes and update the global prototype
+        if args.fedproto:
+            for key in client_protos.keys():
+                global_proto[key] = torch.stack(client_protos[key]).mean(dim=0)
+    
+        if args.fedproto:
+            print(f"Global round {_round+1} loss: {client_test_loss/len(round_clients)}, accuracy: {client_test_acc/len(round_clients)}")   
+        else:
+            global_model.load_state_dict(running_avg)
+            _loss, _acc = test(args, global_model, testloader)
+            print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
 
 def parse_arguments():
     """
@@ -110,7 +145,7 @@ def parse_arguments():
     # Define command-line arguments
     parser.add_argument('-clients', '--clients', default=10, type=str, help='Total number of clients in FL')
     parser.add_argument('-batchsize', '--batchsize', default=32, type=str, help='Total number of clients in FL')
-    parser.add_argument('-iid', '--isiid', default=True, type=bool, help='Total number of clients in FL')
+    parser.add_argument('-iid', '--isiid', default=False, type=bool, help='Total number of clients in FL')
     parser.add_argument('-seed', '--seed', default=42, type=bool, help='Total number of clients in FL')
     parser.add_argument('-alpha', '--alpha', default=0.07, type=int, help='Dritchelet alpha value')
     parser.add_argument('-log', '--log', default=True, type=bool, help='log all outputs')
