@@ -70,7 +70,7 @@ def train(args, net, trainloader, global_proto=None):
                 loss2 = F.mse_loss(proto, batch_global_proto.to(args.device))
 
             # total loss
-            loss = loss1 + loss2
+            loss = loss1 + (args.ld*loss2)
 
             loss.backward()
             optimizer.step()
@@ -94,7 +94,7 @@ def train(args, net, trainloader, global_proto=None):
     
            
         if args.clog:
-            print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}")
+            print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}, loss1 {loss1}, loss2 {loss2}")
     
     # average the client prototypes
     for key in client_protos.keys():
