@@ -81,9 +81,15 @@ def load_mnist_partition(args, partition_id: int):
 
 def load_cifar10_partition(args, partition_id: int):
 
-    #fds = FederatedDataset(dataset="cifar10", partitioners={"train": num_partitions})
+    merger = Merger(
+            merge_config={
+                "train": ("train", "test"),
+                })
+    
+
     fds = FederatedDataset(
         dataset="cifar10",
+        preprocessor= merger if args.fedproto else None,
         partitioners={
             "train": IidPartitioner(
                         num_partitions=args.clients,
@@ -100,8 +106,18 @@ def load_cifar10_partition(args, partition_id: int):
         },
     )
 
-    client_partition = fds.load_partition(partition_id)
-    global_test = fds.load_split("test")
+    client_train = fds.load_partition(partition_id, split="train")
+    
+    partition_train_test = client_train.train_test_split(test_size=args.split, seed=args.seed)
+    
+    if args.fedproto:
+        client_train = partition_train_test["train"]
+        client_test = partition_train_test["test"]
+        print(f"Client train size: {len(client_train)}")
+        exit(0)
+    else:
+        client_test = fds.load_split("test")
+        print(f"Client train size: {len(client_train)}")
 
     pytorch_transforms = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
@@ -112,12 +128,12 @@ def load_cifar10_partition(args, partition_id: int):
         return batch
 
     # Apply the transforms
-    client_partition = client_partition.with_transform(apply_transforms)
-    global_test = global_test.with_transform(apply_transforms)
+    client_train = client_train.with_transform(apply_transforms)
+    client_test = client_test.with_transform(apply_transforms)
 
     # Prepare the DataLoader
-    trainloader = DataLoader(client_partition, batch_size=args.batchsize)
-    testloader = DataLoader(global_test, batch_size=args.batchsize)
+    trainloader = DataLoader(client_train, batch_size=args.batchsize)
+    testloader = DataLoader(client_test, batch_size=args.batchsize)
   
     return trainloader, testloader
 

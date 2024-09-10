@@ -121,7 +121,7 @@ def parse_arguments():
     parser.add_argument('-round', '--round', default=20, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.99, type=float, help='client split for training')
     parser.add_argument('-data', '--data', default='cifar10', type=str, help='model to train')
-    parser.add_argument('-fedproto', '--fedproto', default=True, type=str, help='use federated prototyping')
+    parser.add_argument('-fedproto', '--fedproto', default=False, type=str, help='use federated prototyping')
    
 
     # Parse arguments
