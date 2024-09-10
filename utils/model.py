@@ -16,10 +16,10 @@ class Cifar10Net(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        proto = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(proto))
         x = self.fc3(x)
-        return x
+        return x, proto
     
     
 class MnistNet(nn.Module):
@@ -36,7 +36,7 @@ class MnistNet(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = x.view(-1, 16 * 4 * 4)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        proto = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(proto))
         x = self.fc3(x)
-        return x
+        return x, proto

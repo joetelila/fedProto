@@ -4,6 +4,7 @@ import torch
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple
 import numpy as np
+import torch.nn.functional as F
 
 
 
@@ -18,14 +19,24 @@ def set_parameters(net, parameters: List[np.ndarray]):
     return net
 
 
-def train(args, net, trainloader):
-    """Train the network on the training set."""
-
+def train(args, net, trainloader, global_proto=None):
+    
+    """
+    Train the network on the training set.
+    
+    """
+    
+    net.train()
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
-    net.train()
+    
     for epoch in range(args.epoch):
+        
         correct, total, epoch_loss = 0, 0, 0.0
+
+        # initialize client prototypes
+        client_protos = {}
+
         for batch in trainloader:
             match args.data:
                 case "mnist":
@@ -34,21 +45,65 @@ def train(args, net, trainloader):
                     images, labels = batch["img"], batch["label"]
                 case _:
                     raise ValueError(f"Unknown dataset: {args.dataset}")
+            
             images, labels = images.to(args.device), labels.to(args.device)
             optimizer.zero_grad()
-            outputs = net(images)
-            loss = criterion(net(images), labels)
+            outputs, proto = net(images)
+            
+            # loss is the sum of the classification loss and the prototype loss
+            loss1 = criterion(outputs, labels)
+            if len(global_proto.keys()) == 0:
+                loss2 = 0*loss1
+            else:
+                batch_global_proto = []
+                for label in labels:
+                    if label.item() in global_proto.keys():
+                        # get the global prototype for the current label.
+                        label_proto = global_proto[label.item()] 
+                        batch_global_proto.append(label_proto)
+                    else:
+                        # if the prototype for the current label is not available, use zero vector.
+                        batch_global_proto.append(torch.zeros(len(proto[0])))
+                batch_global_proto = torch.stack(batch_global_proto)
+                
+                # compute loss 2
+                loss2 = F.mse_loss(proto, batch_global_proto.to(args.device))
+
+            # total loss
+            loss = loss1 + loss2
+
             loss.backward()
             optimizer.step()
+
+            # collect client prototypes on the last epoch only to save computation time.
+            if epoch == args.epoch - 1:
+                for i, label in enumerate(labels):
+                    if label.item() in client_protos.keys():
+                        client_protos[label.item()].append(proto[i].detach().cpu())
+                    else:
+                        client_protos[label.item()] = [proto[i].detach().cpu()]
+                
+            
             # Metrics
             epoch_loss += loss
             total += labels.size(0)
             correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
+        
         epoch_loss /= len(trainloader.dataset)
         epoch_acc = correct / total
+    
+           
         if args.clog:
             print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}")
-    return net
+    
+    # average the client prototypes
+    for key in client_protos.keys():
+        client_protos[key] = torch.stack(client_protos[key]).mean(dim=0)
+    
+    if args.fedproto:
+        return net, client_protos
+    else:
+        return net
 
 
 def test(args, net, testloader):
@@ -66,7 +121,7 @@ def test(args, net, testloader):
                 case _:
                     raise ValueError(f"Unknown dataset: {args.dataset}")
             images, labels = images.to(args.device), labels.to(args.device)
-            outputs = net(images)
+            outputs, protos = net(images)
             loss += criterion(outputs, labels).item()
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)

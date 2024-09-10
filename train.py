@@ -23,6 +23,7 @@ def main():
     
     # print general info about the experiment
     print(f"Dataset: {args.data}")
+    print(f"Fed proto: {args.fedproto}")
     print(f"Total number of clients: {args.clients}")
     print(f"Total number of global rounds: {args.round}")
     print(f"Local epochs: {args.epoch}")
@@ -48,21 +49,38 @@ def main():
 
     # initalize client models with global model
     clients = [global_model for _ in range(args.clients)]
+    
+    # initialize global class prototype
+    global_proto = {
+        #i: torch.zeros(120) for i in range(10)
+    }
 
     # train FL
     for _round in range(args.round):
-        # select 5 clients randomly
+
+        
+        # inialize round client prototypes.
+        # Store client prototypes after training.
+        client_protos = {}
+
+        # select csplit clients randomly
         random.seed(args.seed)
         round_clients = random.sample(range(len(clients)), int(args.clients*args.clsplit))
         
         if args.clog:
             print(f"Round {_round} selected clients: {round_clients}")
 
-        # collect round models for averaging
-        running_avg = None
+        # collect round models for averaging if not using fedproto
+        if not args.fedproto:
+            running_avg = None
         
+        # collect client accuracies
+        client_test_acc = 0
+        client_test_loss = 0
+
         # train the selected clients
         for _client in round_clients:
+            
             if args.clog:
                 print(f"Training client {_client}")
             
@@ -82,18 +100,41 @@ def main():
                     raise ValueError(f"Unknown dataset: {args.data}")
         
             # train the client model
-            _client_model_trained = train(args, _client_model, train_loader)
+            if args.fedproto:
+                _client_model_trained, protos = train(args, _client_model, train_loader, global_proto)
+                _loss, _acc = test(args, _client_model_trained, testloader)
+                client_test_acc += _acc
+                client_test_loss += _loss
+                
+                # collect client prototypes
+                for key in protos.keys():
+                    if key in client_protos.keys():
+                        client_protos[key].append(protos[key])
+                    else:
+                        client_protos[key] = [protos[key]]
+               
+            else:
+                _client_model_trained = train(args, _client_model, train_loader, global_proto)
+                # evaluate the client model
             # add local model parameters to running average
-            running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
+            
+            # Running average of the models
+            if not args.fedproto:
+                running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
 
             #round_models.append(_client_model_trained)
 
-        # average the models
-        #round_average_model = fed_average(round_models)
-        global_model.load_state_dict(running_avg)
-        
-        _loss, _acc = test(args, global_model, testloader)
-        print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
+        # average the client prototypes and update the global prototype
+        if args.fedproto:
+            for key in client_protos.keys():
+                global_proto[key] = torch.stack(client_protos[key]).mean(dim=0)
+    
+        if args.fedproto:
+            print(f"Global round {_round+1} loss: {client_test_loss/len(round_clients)}, accuracy: {client_test_acc/len(round_clients)}")   
+        else:
+            global_model.load_state_dict(running_avg)
+            _loss, _acc = test(args, global_model, testloader)
+            print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
 
 def parse_arguments():
     """
@@ -116,6 +157,8 @@ def parse_arguments():
     parser.add_argument('-round', '--round', default=20, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.99, type=float, help='client split for training')
     parser.add_argument('-data', '--data', default='cifar10', type=str, help='model to train')
+    parser.add_argument('-fedproto', '--fedproto', default=True, type=str, help='use federated prototyping')
+   
 
     # Parse arguments
     args = parser.parse_args()

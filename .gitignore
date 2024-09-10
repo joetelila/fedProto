@@ -9,3 +9,4 @@ test_prepare_data.ipynb
 train_iid-Joe’s MacBook Pro-2.py
 .ipynb_checkpoints/
 train_iid-Joe’s MacBook Pro-2.py
+slurm-*
