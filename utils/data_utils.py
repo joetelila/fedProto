@@ -54,8 +54,6 @@ def load_mnist_partition(args, partition_id: int):
     if args.fedproto:
         client_train = partition_train_test["train"]
         client_test = partition_train_test["test"]
-        print(f"Client train size: {len(client_train)}")
-        exit(0)
     else:
         client_test = fds.load_split("test")
 
@@ -86,7 +84,6 @@ def load_cifar10_partition(args, partition_id: int):
                 "train": ("train", "test"),
                 })
     
-
     fds = FederatedDataset(
         dataset="cifar10",
         preprocessor= merger if args.fedproto else None,
@@ -100,8 +97,7 @@ def load_cifar10_partition(args, partition_id: int):
                         alpha=args.alpha,
                         seed=args.seed,
                         min_partition_size=500,
-                        self_balancing=True,
-                        #num_classes_per_partition = 4
+                        self_balancing=True
                     ),
         },
     )
@@ -113,11 +109,9 @@ def load_cifar10_partition(args, partition_id: int):
     if args.fedproto:
         client_train = partition_train_test["train"]
         client_test = partition_train_test["test"]
-        print(f"Client train size: {len(client_train)}")
-        exit(0)
     else:
         client_test = fds.load_split("test")
-        print(f"Client train size: {len(client_train)}")
+
 
     pytorch_transforms = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
@@ -136,7 +130,6 @@ def load_cifar10_partition(args, partition_id: int):
     testloader = DataLoader(client_test, batch_size=args.batchsize)
   
     return trainloader, testloader
-
 
 def are_models_equal(model1, model2):
     # Compare the state_dict of both models

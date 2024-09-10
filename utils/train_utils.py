@@ -20,7 +20,6 @@ def set_parameters(net, parameters: List[np.ndarray]):
 
 def train(args, net, trainloader):
     """Train the network on the training set."""
-
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
     net.train()

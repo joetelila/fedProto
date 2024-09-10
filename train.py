@@ -23,6 +23,7 @@ def main():
     
     # print general info about the experiment
     print(f"Dataset: {args.data}")
+    print(f"Fed proto: {args.fedproto}")
     print(f"Total number of clients: {args.clients}")
     print(f"Total number of global rounds: {args.round}")
     print(f"Local epochs: {args.epoch}")
@@ -60,8 +61,8 @@ def main():
             print(f"Round {_round} selected clients: {round_clients}")
 
         # collect round models for averaging if not using fedproto
-        if not args.fedproto:
-            running_avg = None
+        #if not args.fedproto:
+        running_avg = None
         
         # train the selected clients
         for _client in round_clients:
@@ -88,17 +89,17 @@ def main():
             _client_model_trained = train(args, _client_model, train_loader)
             # add local model parameters to running average
             
-            if not args.fedproto:
-                running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
+            #if not args.fedproto:
+            running_avg = running_model_avg(running_avg, _client_model_trained.state_dict(), 1/len(round_clients))
 
             #round_models.append(_client_model_trained)
 
         # average the models
         #round_average_model = fed_average(round_models)
-        if not args.fedproto:
-            global_model.load_state_dict(running_avg)
-            _loss, _acc = test(args, global_model, testloader)
-            print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
+        #if not args.fedproto:
+        global_model.load_state_dict(running_avg)
+        _loss, _acc = test(args, global_model, testloader)
+        print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
 
 def parse_arguments():
     """
@@ -121,7 +122,7 @@ def parse_arguments():
     parser.add_argument('-round', '--round', default=20, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.99, type=float, help='client split for training')
     parser.add_argument('-data', '--data', default='cifar10', type=str, help='model to train')
-    parser.add_argument('-fedproto', '--fedproto', default=False, type=str, help='use federated prototyping')
+    parser.add_argument('-fedproto', '--fedproto', default=True, type=str, help='use federated prototyping')
    
 
     # Parse arguments
