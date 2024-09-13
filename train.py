@@ -24,6 +24,7 @@ def main():
     # print general info about the experiment
     print(f"Dataset: {args.data}")
     print(f"Fed proto: {args.fedproto}")
+    print(f"proto loss ld: {args.ld}")
     print(f"Total number of clients: {args.clients}")
     print(f"Total number of global rounds: {args.round}")
     print(f"Local epochs: {args.epoch}")
@@ -143,7 +144,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="A brief description of what the script does.")
     
     # Define command-line arguments
-    parser.add_argument('-clients', '--clients', default=10, type=str, help='Total number of clients in FL')
+    parser.add_argument('-clients', '--clients', default=5, type=str, help='Total number of clients in FL')
     parser.add_argument('-batchsize', '--batchsize', default=32, type=str, help='Total number of clients in FL')
     parser.add_argument('-iid', '--isiid', default=False, type=bool, help='Total number of clients in FL')
     parser.add_argument('-seed', '--seed', default=42, type=bool, help='Total number of clients in FL')
@@ -154,11 +155,11 @@ def parse_arguments():
     parser.add_argument('-epochs', '--epoch', default=10, type=int, help='total epoch per clients')
     parser.add_argument('-lr', '--lr', default=0.001, type=float, help='learning rate')
     parser.add_argument('-device', '--device', default='mps', type=str, help='device to train the model')
-    parser.add_argument('-round', '--round', default=20, type=int, help='total number of global rounds')
+    parser.add_argument('-round', '--round', default=50, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.99, type=float, help='client split for training')
-    parser.add_argument('-data', '--data', default='cifar10', type=str, help='model to train')
+    parser.add_argument('-data', '--data', default='mnist', type=str, help='model to train')
     parser.add_argument('-fedproto', '--fedproto', default=True, type=str, help='use federated prototyping')
-    parser.add_argument('-ld', '--ld', default=0.8, type=int, help='lambda value for prototype loss')
+    parser.add_argument('-ld', '--ld', default=1, type=int, help='lambda value for prototype loss')
    
 
     # Parse arguments

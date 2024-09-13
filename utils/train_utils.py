@@ -28,7 +28,7 @@ def train(args, net, trainloader, global_proto=None):
     
     net.train()
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
+    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=0.5)
     
     for epoch in range(args.epoch):
         
@@ -36,6 +36,8 @@ def train(args, net, trainloader, global_proto=None):
 
         # initialize client prototypes
         client_protos = {}
+        
+        loss_mse = torch.nn.MSELoss().to(args.device)
 
         for batch in trainloader:
             match args.data:
@@ -67,10 +69,10 @@ def train(args, net, trainloader, global_proto=None):
                 batch_global_proto = torch.stack(batch_global_proto)
                 
                 # compute loss 2
-                loss2 = F.mse_loss(proto, batch_global_proto.to(args.device))
+                loss2 = loss_mse(proto, batch_global_proto.to(args.device))
 
             # total loss
-            loss = loss1 + (args.ld*loss2)
+            loss = loss1  + (args.ld*loss2)
 
             loss.backward()
             optimizer.step()
@@ -82,8 +84,7 @@ def train(args, net, trainloader, global_proto=None):
                         client_protos[label.item()].append(proto[i].detach().cpu())
                     else:
                         client_protos[label.item()] = [proto[i].detach().cpu()]
-                
-            
+
             # Metrics
             epoch_loss += loss
             total += labels.size(0)
