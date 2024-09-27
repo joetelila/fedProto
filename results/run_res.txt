@@ -1,0 +1,211 @@
+python train.py
+-----------------------
+Dataset: cifar10
+iid: False
+Fed proto: True
+proto loss ld: 0.1
+pfl: True
+-----------------------
+Total number of clients: 5
+Total number of global rounds: 50
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+split: 0.2
+clsplit: 0.99
+[PFL]Global round 1 loss: 0.026969444700820237, accuracy: 0.6707091157153404
+[PFL]Global round 2 loss: 0.024927316452042693, accuracy: 0.7134666280048888
+[PFL]Global round 3 loss: 0.031010739942533533, accuracy: 0.6952640172454858
+[PFL]Global round 4 loss: 0.036766744124227334, accuracy: 0.6908961302489416
+[PFL]Global round 5 loss: 0.047478880191377776, accuracy: 0.6946111479118742
+[PFL]Global round 6 loss: 0.06396832814232307, accuracy: 0.6815151075492669
+[PFL]Global round 7 loss: 0.07431920776822039, accuracy: 0.6790683749451993
+[PFL]Global round 8 loss: 0.08382619728240122, accuracy: 0.7147088377554563
+[PFL]Global round 9 loss: 0.09064879221319563, accuracy: 0.7062645428496329
+[PFL]Global round 10 loss: 0.09712644874963575, accuracy: 0.7098698558552182
+[PFL]Global round 11 loss: 0.10068330484439236, accuracy: 0.710142346028668
+[PFL]Global round 12 loss: 0.1032560840596132, accuracy: 0.7105501874619733
+[PFL]Global round 13 loss: 0.10531837186909465, accuracy: 0.7101071576370599
+[PFL]Global round 14 loss: 0.10703481566152115, accuracy: 0.709480332042731
+[PFL]Global round 15 loss: 0.10853515810475836, accuracy: 0.7096702366451456
+[PFL]Global round 16 loss: 0.10984928844525793, accuracy: 0.7095844752865301
+[PFL]Global round 17 loss: 0.11101066389976752, accuracy: 0.7087986765664991
+[PFL]Global round 18 loss: 0.11204524402360933, accuracy: 0.7088597687291355
+[PFL]Global round 19 loss: 0.11300091072756582, accuracy: 0.709062222923079
+[PFL]Global round 20 loss: 0.11387239025990427, accuracy: 0.7087965481090512
+[PFL]Global round 21 loss: 0.11468163790500023, accuracy: 0.7084073651002738
+[PFL]Global round 22 loss: 0.11543139830434326, accuracy: 0.7084931264588892
+[PFL]Global round 23 loss: 0.1161345235830091, accuracy: 0.7085243344749459
+[PFL]Global round 24 loss: 0.11679821371227464, accuracy: 0.7088610925986124
+[PFL]Global round 25 loss: 0.11742376833606039, accuracy: 0.7085886024251628
+[PFL]Global round 26 loss: 0.11801396805571748, accuracy: 0.7086596857348016
+[PFL]Global round 27 loss: 0.11857182205184663, accuracy: 0.7087619770604973
+[PFL]Global round 28 loss: 0.11910591748756784, accuracy: 0.7086431557677215
+[PFL]Global round 29 loss: 0.11961211142858061, accuracy: 0.7085009891484437
+[PFL]Global round 30 loss: 0.12009420863412107, accuracy: 0.708940038597806
+[PFL]Global round 31 loss: 0.1205573687570935, accuracy: 0.7088212173050302
+[PFL]Global round 32 loss: 0.1210009442236974, accuracy: 0.7088212173050302
+[PFL]Global round 33 loss: 0.12142893204314947, accuracy: 0.7089780619732847
+[PFL]Global round 34 loss: 0.12183976998929155, accuracy: 0.7090491452829236
+[PFL]Global round 35 loss: 0.12223881337814871, accuracy: 0.7091679665756992
+[PFL]Global round 36 loss: 0.12262300269990212, accuracy: 0.7094436325367292
+[PFL]Global round 37 loss: 0.12299426089599552, accuracy: 0.7094436325367292
+[PFL]Global round 38 loss: 0.12335528667706025, accuracy: 0.7098281286435326
+[PFL]Global round 39 loss: 0.12370477253187204, accuracy: 0.7096859620242548
+[PFL]Global round 40 loss: 0.12404404863265292, accuracy: 0.7096859620242548
+[PFL]Global round 41 loss: 0.12437357510993524, accuracy: 0.7096859620242548
+[PFL]Global round 42 loss: 0.12469268552318226, accuracy: 0.7094202872102271
+[PFL]Global round 43 loss: 0.12500458596283553, accuracy: 0.7093492039005882
+[PFL]Global round 44 loss: 0.12530730897216713, accuracy: 0.7093492039005882
+[PFL]Global round 45 loss: 0.12560467706161602, accuracy: 0.7093492039005882
+[PFL]Global round 46 loss: 0.125892693489294, accuracy: 0.7094514952262838
+[PFL]Global round 47 loss: 0.1261740281982661, accuracy: 0.7094514952262838
+[PFL]Global round 48 loss: 0.12644751677258656, accuracy: 0.7093804119166449
+[PFL]Global round 49 loss: 0.12671554675643873, accuracy: 0.709162475085754
+[PFL]Global round 50 loss: 0.12697718035240363, accuracy: 0.7090203084664762
+
+
+python train.py
+-----------------------
+Dataset: cifar10
+iid: False
+Fed proto: False
+proto loss ld: 0.1
+pfl: False
+-----------------------
+Total number of clients: 5
+Total number of global rounds: 50
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+split: 0.2
+clsplit: 0.99
+[RFL]Global round R-FL 1 loss: 0.07758555144071579, accuracy: 0.1772
+[RFL]Global round R-FL 2 loss: 0.0749006564617157, accuracy: 0.2547
+[RFL]Global round R-FL 3 loss: 0.07438314269781113, accuracy: 0.3339
+[RFL]Global round R-FL 4 loss: 0.07740953249931336, accuracy: 0.403
+[RFL]Global round R-FL 5 loss: 0.08000849987268448, accuracy: 0.4245
+[RFL]Global round R-FL 6 loss: 0.08358291056156159, accuracy: 0.4279
+[RFL]Global round R-FL 7 loss: 0.08916342455148697, accuracy: 0.4138
+[RFL]Global round R-FL 8 loss: 0.10384765726327896, accuracy: 0.4329
+[RFL]Global round R-FL 9 loss: 0.11075567384958267, accuracy: 0.4341
+[RFL]Global round R-FL 10 loss: 0.11840419054031372, accuracy: 0.4267
+[RFL]Global round R-FL 11 loss: 0.13287120459079743, accuracy: 0.422
+[RFL]Global round R-FL 12 loss: 0.1465777838230133, accuracy: 0.4352
+[RFL]Global round R-FL 13 loss: 0.15366224761009217, accuracy: 0.4289
+[RFL]Global round R-FL 14 loss: 0.16348127946853638, accuracy: 0.4354
+[RFL]Global round R-FL 15 loss: 0.16693449280261993, accuracy: 0.4334
+[RFL]Global round R-FL 16 loss: 0.17258161630630492, accuracy: 0.4343
+[RFL]Global round R-FL 17 loss: 0.17607725985050202, accuracy: 0.4369
+[RFL]Global round R-FL 18 loss: 0.17626294696331024, accuracy: 0.4334
+[RFL]Global round R-FL 19 loss: 0.1835116880774498, accuracy: 0.4348
+[RFL]Global round R-FL 20 loss: 0.1862907777786255, accuracy: 0.4315
+[RFL]Global round R-FL 21 loss: 0.18799077911376952, accuracy: 0.4373
+[RFL]Global round R-FL 22 loss: 0.19213276720046998, accuracy: 0.4297
+[RFL]Global round R-FL 23 loss: 0.19270359809398652, accuracy: 0.4319
+[RFL]Global round R-FL 24 loss: 0.19803285956382752, accuracy: 0.4355
+[RFL]Global round R-FL 25 loss: 0.19803558094501494, accuracy: 0.4326
+[RFL]Global round R-FL 26 loss: 0.2045636536359787, accuracy: 0.4321
+[RFL]Global round R-FL 27 loss: 0.20590071001052856, accuracy: 0.4298
+[RFL]Global round R-FL 28 loss: 0.20629158689975738, accuracy: 0.4324
+[RFL]Global round R-FL 29 loss: 0.21038516445159913, accuracy: 0.4281
+[RFL]Global round R-FL 30 loss: 0.2117982141971588, accuracy: 0.4322
+[RFL]Global round R-FL 31 loss: 0.2191583884000778, accuracy: 0.4321
+[RFL]Global round R-FL 32 loss: 0.22201157031059265, accuracy: 0.4302
+[RFL]Global round R-FL 33 loss: 0.21869030077457427, accuracy: 0.4337
+[RFL]Global round R-FL 34 loss: 0.22913445115089418, accuracy: 0.4329
+[RFL]Global round R-FL 35 loss: 0.22969193487167358, accuracy: 0.4323
+[RFL]Global round R-FL 36 loss: 0.23681235044002533, accuracy: 0.4315
+[RFL]Global round R-FL 37 loss: 0.240300239944458, accuracy: 0.4371
+[RFL]Global round R-FL 38 loss: 0.24183670530319215, accuracy: 0.433
+[RFL]Global round R-FL 39 loss: 0.24531924266815186, accuracy: 0.432
+[RFL]Global round R-FL 40 loss: 0.24780536267757416, accuracy: 0.4275
+[RFL]Global round R-FL 41 loss: 0.25322526421546937, accuracy: 0.4341
+[RFL]Global round R-FL 42 loss: 0.2587462646484375, accuracy: 0.4314
+[RFL]Global round R-FL 43 loss: 0.26136956005096434, accuracy: 0.4339
+[RFL]Global round R-FL 44 loss: 0.25050397889614107, accuracy: 0.4341
+[RFL]Global round R-FL 45 loss: 0.2566468646764755, accuracy: 0.4353
+[RFL]Global round R-FL 46 loss: 0.2638786712646484, accuracy: 0.4349
+[RFL]Global round R-FL 47 loss: 0.26836290960311887, accuracy: 0.4327
+[RFL]Global round R-FL 48 loss: 0.26705346360206605, accuracy: 0.4351
+[RFL]Global round R-FL 49 loss: 0.26374638369083403, accuracy: 0.4345
+[RFL]Global round R-FL 50 loss: 0.27678898725509643, accuracy: 0.4315
+
+
+
+
+
+python train.py
+-----------------------
+Dataset: cifar10
+iid: True
+Fed proto: False
+proto loss ld: 0.1
+pfl: False
+-----------------------
+Total number of clients: 5
+Total number of global rounds: 50
+Local epochs: 10
+Batch size: 32
+learning rate: 0.001
+device: mps
+seed: 42
+alpha: 0.07
+split: 0.2
+clsplit: 0.99
+[RFL]Global round R-FL 1 loss: 0.04672076930999756, accuracy: 0.454
+[RFL]Global round R-FL 2 loss: 0.03930661209821701, accuracy: 0.5627
+[RFL]Global round R-FL 3 loss: 0.0403016950905323, accuracy: 0.5733
+[RFL]Global round R-FL 4 loss: 0.04090219529867172, accuracy: 0.5937
+[RFL]Global round R-FL 5 loss: 0.04519471677541733, accuracy: 0.588
+[RFL]Global round R-FL 6 loss: 0.0537057596385479, accuracy: 0.5808
+[RFL]Global round R-FL 7 loss: 0.06321698039770127, accuracy: 0.5851
+[RFL]Global round R-FL 8 loss: 0.07322599588036537, accuracy: 0.5827
+[RFL]Global round R-FL 9 loss: 0.07724527318477631, accuracy: 0.587
+[RFL]Global round R-FL 10 loss: 0.0855843680024147, accuracy: 0.578
+[RFL]Global round R-FL 11 loss: 0.09054856252074242, accuracy: 0.5842
+[RFL]Global round R-FL 12 loss: 0.09471800151467323, accuracy: 0.5855
+[RFL]Global round R-FL 13 loss: 0.09999542354345321, accuracy: 0.5843
+[RFL]Global round R-FL 14 loss: 0.10483123042583466, accuracy: 0.5869
+[RFL]Global round R-FL 15 loss: 0.10911328245401382, accuracy: 0.5859
+[RFL]Global round R-FL 16 loss: 0.11175832513570785, accuracy: 0.5861
+[RFL]Global round R-FL 17 loss: 0.11466264657974243, accuracy: 0.5831
+[RFL]Global round R-FL 18 loss: 0.1168259787082672, accuracy: 0.5817
+[RFL]Global round R-FL 19 loss: 0.11952451294660568, accuracy: 0.5829
+[RFL]Global round R-FL 20 loss: 0.11990304684638978, accuracy: 0.5836
+[RFL]Global round R-FL 21 loss: 0.1225849573969841, accuracy: 0.5789
+[RFL]Global round R-FL 22 loss: 0.12313704948425293, accuracy: 0.5787
+[RFL]Global round R-FL 23 loss: 0.1264708154320717, accuracy: 0.5771
+[RFL]Global round R-FL 24 loss: 0.1283933067202568, accuracy: 0.5799
+[RFL]Global round R-FL 25 loss: 0.13036743377447127, accuracy: 0.5783
+[RFL]Global round R-FL 26 loss: 0.1319327178478241, accuracy: 0.5759
+[RFL]Global round R-FL 27 loss: 0.13553605448007583, accuracy: 0.5757
+[RFL]Global round R-FL 28 loss: 0.1375491593837738, accuracy: 0.5766
+[RFL]Global round R-FL 29 loss: 0.13935774309635163, accuracy: 0.5776
+[RFL]Global round R-FL 30 loss: 0.14267332586050033, accuracy: 0.5748
+[RFL]Global round R-FL 31 loss: 0.14126724338531493, accuracy: 0.5732
+[RFL]Global round R-FL 32 loss: 0.1437631374001503, accuracy: 0.5729
+[RFL]Global round R-FL 33 loss: 0.1467192927837372, accuracy: 0.5716
+[RFL]Global round R-FL 34 loss: 0.14884642422199248, accuracy: 0.5731
+[RFL]Global round R-FL 35 loss: 0.15179659876823426, accuracy: 0.5681
+[RFL]Global round R-FL 36 loss: 0.1535869365811348, accuracy: 0.5733
+[RFL]Global round R-FL 37 loss: 0.15555141639709472, accuracy: 0.57
+[RFL]Global round R-FL 38 loss: 0.1579082439303398, accuracy: 0.5728
+[RFL]Global round R-FL 39 loss: 0.16020121643543245, accuracy: 0.5734
+[RFL]Global round R-FL 40 loss: 0.16082817318439482, accuracy: 0.5722
+[RFL]Global round R-FL 41 loss: 0.16411104955673217, accuracy: 0.5679
+[RFL]Global round R-FL 42 loss: 0.16390891375541686, accuracy: 0.5677
+[RFL]Global round R-FL 43 loss: 0.16861503086090088, accuracy: 0.5672
+[RFL]Global round R-FL 44 loss: 0.1670742426276207, accuracy: 0.5658
+[RFL]Global round R-FL 45 loss: 0.17232070162296295, accuracy: 0.5658
+[RFL]Global round R-FL 46 loss: 0.17268712004423142, accuracy: 0.5631
+[RFL]Global round R-FL 47 loss: 0.1764247878551483, accuracy: 0.5645
+[RFL]Global round R-FL 48 loss: 0.17712810841798782, accuracy: 0.565
+[RFL]Global round R-FL 49 loss: 0.179774942946434, accuracy: 0.5639
+[RFL]Global round R-FL 50 loss: 0.18229471206665038, accuracy: 0.5661

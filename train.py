@@ -2,7 +2,7 @@ import argparse
 import logging
 import random
 import copy
-
+import pickle
 from flwr_datasets import FederatedDataset
 from flwr_datasets.visualization import plot_label_distributions
 
@@ -22,9 +22,13 @@ def main():
     args = parse_arguments()
     
     # print general info about the experiment
+    print("-----------------------")
     print(f"Dataset: {args.data}")
+    print(f"iid: {args.isiid}")
     print(f"Fed proto: {args.fedproto}")
     print(f"proto loss ld: {args.ld}")
+    print(f"pfl: {args.pfl}")
+    print("-----------------------")
     print(f"Total number of clients: {args.clients}")
     print(f"Total number of global rounds: {args.round}")
     print(f"Local epochs: {args.epoch}")
@@ -33,7 +37,6 @@ def main():
     print(f"device: {args.device}")
     print(f"seed: {args.seed}")
     print(f"alpha: {args.alpha}")
-    print(f"iid: {args.isiid}")
     print(f"split: {args.split}")
     print(f"clsplit: {args.clsplit}")
 
@@ -85,12 +88,14 @@ def main():
             if args.clog:
                 print(f"Training client {_client}")
             
-            _client_model = copy.deepcopy(clients[_client])
-            _client_model = set_parameters(_client_model, get_parameters(global_model))
+            if not args.fedproto:
+                _client_model = copy.deepcopy(clients[_client])
+                _client_model = set_parameters(_client_model, get_parameters(global_model))
+            
             # check if the global model is correctly set to client model
-            if not are_models_equal(_client_model, global_model):
-                print("Global model is not correctly set to client model")
-                exit(0)
+            if not args.fedproto:
+                if not are_models_equal(_client_model, global_model):
+                    raise ValueError("Global model is not correctly set to client model")
     
             match args.data:
                 case "mnist":
@@ -102,13 +107,20 @@ def main():
         
             # train the client model
             if args.fedproto:
-                _client_model_trained, protos = train(args, _client_model, train_loader, global_proto)
-                _loss, _acc = test(args, _client_model_trained, testloader)
+                _client_model_trained, protos = train(args, copy.deepcopy(clients[_client]), train_loader, global_proto)
+                _loss, _acc, test_protos, test_labels = test(args, _client_model_trained, testloader)
+                
+                # save client test protos and labels
+                with open(f"protos/client_{_client}_proto_round_{_round}.pkl", "wb") as f:
+                    pickle.dump(test_protos, f)
+                with open(f"protos/client_{_client}_labels_round_{_round}.pkl", "wb") as f:
+                    pickle.dump(test_labels, f)
+
                 client_test_acc += _acc
                 client_test_loss += _loss
 
                 # replace client model with trained model
-                clients[_client] = _client_model_trained
+                clients[_client] = copy.deepcopy(_client_model_trained)
                 
                 # collect client prototypes
                 for key in protos.keys():
@@ -132,13 +144,26 @@ def main():
         if args.fedproto:
             for key in client_protos.keys():
                 global_proto[key] = torch.stack(client_protos[key]).mean(dim=0)
-    
-        if args.fedproto:
-            print(f"Global round {_round+1} loss: {client_test_loss/len(round_clients)}, accuracy: {client_test_acc/len(round_clients)}")   
+        
+        # # save prototype to a file
+        # with open(f"protos/global_proto_{_round}.pkl", "wb") as f:
+        #     pickle.dump(global_proto, f)
+
+
+        if args.fedproto or args.pfl:
+            print(f"[PFL]Global round {_round+1} loss: {client_test_loss/len(round_clients)}, accuracy: {client_test_acc/len(round_clients)}")   
+            
         else:
             global_model.load_state_dict(running_avg)
-            _loss, _acc = test(args, global_model, testloader)
-            print(f"Global round {_round+1} loss: {_loss}, accuracy: {_acc}")
+            _loss, _acc,test_protos, test_labels = test(args, global_model, testloader)
+            
+            # save client test protos and labels
+            with open(f"protos/proto_round_{_round}.pkl", "wb") as f:
+                pickle.dump(test_protos, f)
+            with open(f"protos/labels_round_{_round}.pkl", "wb") as f:
+                pickle.dump(test_labels, f)
+            
+            print(f"[RFL]Global round R-FL {_round+1} loss: {_loss}, accuracy: {_acc}")
 
 def parse_arguments():
     """
@@ -147,22 +172,29 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="A brief description of what the script does.")
     
     # Define command-line arguments
-    parser.add_argument('-clients', '--clients', default=5, type=str, help='Total number of clients in FL')
+    parser.add_argument('-clients', '--clients', default=6, type=str, help='Total number of clients in FL')
     parser.add_argument('-batchsize', '--batchsize', default=32, type=str, help='Total number of clients in FL')
     parser.add_argument('-iid', '--isiid', default=False, type=bool, help='Total number of clients in FL')
     parser.add_argument('-seed', '--seed', default=42, type=bool, help='Total number of clients in FL')
+    
     parser.add_argument('-alpha', '--alpha', default=0.07, type=int, help='Dritchelet alpha value')
     parser.add_argument('-log', '--log', default=True, type=bool, help='log all outputs')
     parser.add_argument('-clog', '--clog', default=False, type=bool, help='client log')
     parser.add_argument('-split', '--split', default=0.2, type=int, help='log all outputs')
     parser.add_argument('-epochs', '--epoch', default=10, type=int, help='total epoch per clients')
+    
     parser.add_argument('-lr', '--lr', default=0.001, type=float, help='learning rate')
     parser.add_argument('-device', '--device', default='mps', type=str, help='device to train the model')
     parser.add_argument('-round', '--round', default=50, type=int, help='total number of global rounds')
     parser.add_argument('-clsplit', '--clsplit', default=0.99, type=float, help='client split for training')
-    parser.add_argument('-data', '--data', default='cifar10', type=str, help='model to train')
-    parser.add_argument('-fedproto', '--fedproto', default=True, type=str, help='use federated prototyping')
+    parser.add_argument('-data', '--data', default='mnist', type=str, help='model to train')
+    
+    parser.add_argument('-fedproto', '--fedproto', default=False, type=str, help='use federated prototyping')
+    parser.add_argument('-pfl', '--pfl', default=False, type=str, help='train pfl without fedproto loss')
     parser.add_argument('-ld', '--ld', default=1, type=int, help='lambda value for prototype loss')
+
+    # add momentum argunent
+    parser.add_argument('-momentum', '--momentum', default=0.95, type=float, help='momentum value')
    
 
     # Parse arguments
