@@ -18,6 +18,47 @@ def set_parameters(net, parameters: List[np.ndarray]):
     net.load_state_dict(state_dict, strict=True)
     return net
 
+def test(args, net, testloader):
+    """Evaluate the network on the entire test set."""
+    criterion = torch.nn.CrossEntropyLoss()
+    correct, total, loss = 0, 0, 0.0
+    net.eval()
+
+    # Initialize lists to collect prototypes and labels
+    protos_list = []
+    labels_list = []
+
+    with torch.no_grad():
+        for batch in testloader:
+            match args.data:
+                case "mnist":
+                    images, labels = batch["image"], batch["label"]
+                case "cifar10":
+                    images, labels = batch["img"], batch["label"]
+                case _:
+                    raise ValueError(f"Unknown dataset: {args.dataset}")
+            images, labels = images.to(args.device), labels.to(args.device)
+            outputs, protos = net(images)
+            
+            # Collect prototypes and labels
+            protos_list.append(protos)
+            labels_list.append(labels)
+
+
+            loss += criterion(outputs, labels).item()
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    
+    # Concatenate all prototypes and labels into tensors
+    test_protos = torch.cat(protos_list, dim=0)
+    test_labels = torch.cat(labels_list, dim=0)
+
+    loss /= len(testloader.dataset)
+    accuracy = correct / total
+    if args.clog:
+        print(f"Test loss {loss}, accuracy {accuracy}")
+    return loss, accuracy, test_protos, test_labels
 
 def train(args, net, trainloader, global_proto=None):
     
@@ -27,8 +68,9 @@ def train(args, net, trainloader, global_proto=None):
     """
     
     net.train()
+
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=0.5)
+    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=args.momentum)
     
     for epoch in range(args.epoch):
         
@@ -36,8 +78,6 @@ def train(args, net, trainloader, global_proto=None):
 
         # initialize client prototypes
         client_protos = {}
-        
-        loss_mse = torch.nn.MSELoss().to(args.device)
 
         for batch in trainloader:
             match args.data:
@@ -54,26 +94,18 @@ def train(args, net, trainloader, global_proto=None):
             
             # loss is the sum of the classification loss and the prototype loss
             loss1 = criterion(outputs, labels)
-            if len(global_proto.keys()) == 0:
-                loss2 = 0*loss1
+            
+            if args.pfl:
+                loss2 = 0*loss1 #computeProtoLoss(args, proto, global_proto, labels, loss1)
             else:
-                batch_global_proto = []
-                for label in labels:
-                    if label.item() in global_proto.keys():
-                        # get the global prototype for the current label.
-                        label_proto = global_proto[label.item()] 
-                        batch_global_proto.append(label_proto)
-                    else:
-                        # if the prototype for the current label is not available, use zero vector.
-                        batch_global_proto.append(torch.zeros(len(proto[0])))
-                batch_global_proto = torch.stack(batch_global_proto)
-                
-                # compute loss 2
-                loss2 = loss_mse(proto, batch_global_proto.to(args.device))
+                loss2 = computeProtoLoss(args, proto, global_proto, labels, loss1)
 
             # total loss
-            loss = loss1  + (args.ld*loss2)
-
+            if args.fedproto:
+                loss = loss1  + (args.ld*loss2)
+            else:
+                loss2 = 0*loss1
+                loss = loss1  + (args.ld*loss2)
             loss.backward()
             optimizer.step()
 
@@ -92,7 +124,7 @@ def train(args, net, trainloader, global_proto=None):
         
         epoch_loss /= len(trainloader.dataset)
         epoch_acc = correct / total
-    
+
            
         if args.clog:
             print(f"Epoch {epoch+1}: train loss {epoch_loss}, accuracy {epoch_acc}, loss1 {loss1}, loss2 {loss2}")
@@ -107,32 +139,36 @@ def train(args, net, trainloader, global_proto=None):
         return net
 
 
-def test(args, net, testloader):
-    """Evaluate the network on the entire test set."""
-    criterion = torch.nn.CrossEntropyLoss()
-    correct, total, loss = 0, 0, 0.0
-    net.eval()
-    with torch.no_grad():
-        for batch in testloader:
-            match args.data:
-                case "mnist":
-                    images, labels = batch["image"], batch["label"]
-                case "cifar10":
-                    images, labels = batch["img"], batch["label"]
-                case _:
-                    raise ValueError(f"Unknown dataset: {args.dataset}")
-            images, labels = images.to(args.device), labels.to(args.device)
-            outputs, protos = net(images)
-            loss += criterion(outputs, labels).item()
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-    loss /= len(testloader.dataset)
-    accuracy = correct / total
-    if args.clog:
-        print(f"Test loss {loss}, accuracy {accuracy}")
-    return loss, accuracy
+def computeProtoLoss(args, proto, global_proto, labels, loss1):
+    
+    """
+    - Compute the prototype loss between the client prototypes 
+      and the global prototype.
+    """
+    
+    proto_loss = 0
+    loss_mse = torch.nn.MSELoss().to(args.device)
 
+    if len(global_proto.keys()) == 0:
+        loss2 = 0*loss1
+        return loss2
+    else:
+        batch_global_proto = []
+        for label in labels:
+            if label.item() in global_proto.keys():
+                # get the global prototype for the current label.
+                label_proto = global_proto[label.item()] 
+                batch_global_proto.append(label_proto)
+            else:
+                # if the prototype for the current label is not available, use zero vector.
+                batch_global_proto.append(torch.zeros(len(proto[0])))
+    
+        batch_global_proto = torch.stack(batch_global_proto)
+        # compute loss 2
+        proto_loss = loss_mse(proto, batch_global_proto.to(args.device))
+    
+    return proto_loss
+    
 
 def fed_average(models):
     """Compute the average of the given models."""

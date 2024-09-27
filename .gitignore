@@ -10,3 +10,6 @@ train_iid-Joe’s MacBook Pro-2.py
 .ipynb_checkpoints/
 train_iid-Joe’s MacBook Pro-2.py
 slurm-*
+protos/
+protos-copy/
+protos-fedproto/
